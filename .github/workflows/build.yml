@@ -1,0 +1,30 @@
+name: VCH Build
+
+on:
+  push:
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set Command Prompt for Microsoft
+        uses: TheMrMilchmann/setup-msvc-dev@v3
+        with:
+          arch: x86
+
+      - name: Build DLL
+        run: msbuild "VCH.vcxproj" /p:VcpkgEnableManifest=true /p:Platform=x86 /p:Configuration=Release
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: CoFrance.dll
+          path: Release/VCH.dll
