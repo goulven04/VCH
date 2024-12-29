@@ -6,7 +6,7 @@ clock_t timerOn;
 
 bool FLASH, sync, NOBLINK, NOCTLT, DEBUG = false;
 bool NORC, NORS, NORP, NORT, NORD = false;
-COLORREF colorHOS{ TAG_YELLOW }, colorRQC{ TAG_GREEN }, colorRQP{ TAG_YELLOW }, colorRQS{ TAG_YELLOW }, colorRQT{ TAG_ORANGE }, colorRQD{ TAG_RED }, colorNCTL{ TAG_RED }, colorCTL{ TAG_GREEN }, colorCFT{ TAG_ORANGE }, colorREM{ TAG_CYAN }, colorNRM{ TAG_GREY };
+COLORREF colorHOS{ TAG_YELLOW }, colorRQC{ TAG_GREEN }, colorRQP{ TAG_YELLOW }, colorRQS{ TAG_YELLOW }, colorRQT{ TAG_ORANGE }, colorRQD{ TAG_RED }, colorNCTL{ TAG_RED }, colorCTL{ TAG_GREEN }, colorCFT{ TAG_ORANGE }, colorREM{ TAG_CYAN }, colorNRM{ TAG_GREY }, colorPROP{ TAG_PURPLE };
 double distanceCTL = 40;
 double distanceCFT = 2;
 string reminderSymbol = "@";
@@ -38,6 +38,8 @@ CVCHPlugin::CVCHPlugin() : EuroScopePlugIn::CPlugIn(EuroScopePlugIn::COMPATIBILI
 	RegisterTagItemType("Reminder", TAG_ITEM_VCH_REM);
 	RegisterTagItemType("Reminder only when active", TAG_ITEM_VCH_SRM);
 	RegisterTagItemFunction("Switch Reminder", TAG_FUNC_VCH_REM);
+
+	RegisterTagItemType("Aircraft type (colored)", TAG_ITEM_VCH_ATC);
 
 	timerOn = clock();
 
@@ -163,6 +165,12 @@ CVCHPlugin::CVCHPlugin() : EuroScopePlugIn::CPlugIn(EuroScopePlugIn::COMPATIBILI
 		colorNRM = stringToColor(settingLoad);
 		if (colorNRM == RGB(2, 2, 2)) {
 			colorNRM = TAG_GREY;
+		}
+	}
+	if ((settingLoad = GetDataFromSettings("vch_c_prop")) != NULL) {
+		colorPROP = stringToColor(settingLoad);
+		if (colorPROP == RGB(2, 2, 2)) {
+			colorPROP = TAG_PURPLE;
 		}
 	}
 	if ((settingLoad = GetDataFromSettings("vch_ctl_t")) != NULL) {
@@ -492,6 +500,22 @@ void CVCHPlugin::OnGetTagItem(CFlightPlan flightPlan, CRadarTarget RadarTarget, 
 		
 	}
 
+	if (ItemCode == TAG_ITEM_VCH_ATC) {
+		if (flightPlan.IsValid()) {
+			char engineType = flightPlan.GetFlightPlanData().GetEngineType();
+			if (engineType == 'P' || engineType == 'T') {
+				if (colorPROP != RGB(1, 1, 1)) {
+					*pColorCode = TAG_COLOR_RGB_DEFINED;
+					*pRGB = colorPROP;
+				} else {
+					*pColorCode = TAG_COLOR_DEFAULT;
+				}
+			} else {
+				*pColorCode = TAG_COLOR_DEFAULT;
+			}
+			strcpy_s(sItemString, 16, flightPlan.GetFlightPlanData().GetAircraftFPType());
+		}
+	}
 }
 
 void CVCHPlugin::OnFunctionCall(int FunctionId, const char * sItemString, POINT Pt, RECT Area)
@@ -735,6 +759,12 @@ bool CVCHPlugin::OnCompileCommand(const char* sCommandLine) {
 					colorNRM = TAG_GREY;
 				}
 				SaveDataToSettings("vch_c_nrm", "Color of tag item: Reminder not active", colorCode.c_str());
+			} else if (buffer == "prop") {
+				colorNRM = stringToColor(colorCode);
+				if (colorNRM == RGB(2, 2, 2)) {
+					colorNRM = TAG_GREY;
+				}
+				SaveDataToSettings("vch_c_prop", "Color of tag item: Prop Engine Type", colorCode.c_str());
 			} else {
 				displayError("Parameter for .vch color invalid!");
 			}

@@ -40,6 +40,8 @@ const int TAG_ITEM_VCH_REM = 340;
 const int TAG_ITEM_VCH_SRM = 341;
 const int TAG_FUNC_VCH_REM = 346;
 
+const int TAG_ITEM_VCH_ATC = 651;
+
 const int SYNC_REQUEST = 100;
 
 const int TAG_STRIP_ANNO_REM = 8;
@@ -57,9 +59,9 @@ const COLORREF TAG_YELLOW = RGB(220, 220, 0);
 const COLORREF TAG_ORANGE = RGB(255, 190, 0);
 const COLORREF TAG_CYAN = RGB(0, 220, 220);
 const COLORREF TAG_BLUE = RGB(0, 0, 220);
+const COLORREF TAG_PURPLE = RGB(237, 168, 255);
 const COLORREF TAG_GREY = RGB(130, 130, 130);
 const COLORREF TAG_WHITE = RGB(220, 220, 220);
-
 
 inline static bool startsWith(const char *pre, const char *str)
 {
