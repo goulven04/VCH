@@ -26,5 +26,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: CoFrance.dll
+          name: VCH.dll
           path: Release/VCH.dll
